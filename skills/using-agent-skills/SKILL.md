@@ -24,15 +24,15 @@ Use the table as the primary router. Chain skills only when the next skill chang
 | Domain language, business rules, bounded contexts, subdomains, invariants, workflows, or code/wiki terminology are load-bearing. | `domain-driven-design` | Domain model report and updates to `CONTEXT.md`, `docs/domain-map.md`, `docs/domain-model.md`, or ADRs when supported. |
 | Runtime/integration events, async workflows, pub/sub, queues, streams, event buses, outbox/inbox, sagas, projections, replay, event contracts, fan-out, or event reliability need design. | `event-driven-architecture` | EDA decision report with event map, topology, contracts, reliability plan, observability, tests, and artifact updates when supported. |
 | Need to try, mock up, sanity-check, or compare a design before committing. | `prototype` | Throwaway logic prototype or UI variants answering a specific design question. |
-| Framework/library correctness matters, behavior may be version-sensitive/stale, or implementation must be source-backed. | `source-driven-development` | Decisions grounded in official documentation and citations. |
-| Multi-file feature, refactor, migration, or behavior change must land safely in small verified slices. | `incremental-implementation` | Story card, ordered slices, per-slice implementation, verification, and commit-ready increments. |
+| Framework/library behavior is version-sensitive, unfamiliar, likely stale, production-critical, reusable, or explicitly needs source-backed correctness. | `source-driven-development` | Targeted official documentation checks and citations for the decisions docs actually affect. |
+| Multi-file work has behavior, dependencies, rollback, validation, or boundary risk that would be hard to reason about in one pass. | `incremental-implementation` | Story card when useful, ordered slices, per-slice implementation, verification, and commit-ready increments. |
 | Non-event behavior involves retries, timeouts, idempotency, duplicate inputs, external services, background jobs, concurrency, caching/staleness, partial failure, recovery, or reconciliation. | `reliability-design` | Failure modes, semantics, observability, tests, and handoff to quality gates or TDD. |
 | Feature, refactor, migration, or risky change needs early quality feedback, test seams, risk map, or gates before implementation. | `shift-left-testing` | Risk map, test seams, traceability-lite, minimum local/CI gate, explicit non-goals, and execution handoff. |
 | Change touches build, CI, packaging, deployment, release process, env vars, feature flags, migrations, public contracts, or production-facing behavior. | `continuous-delivery-readiness` | Delivery-path discovery, release-impact classification, merge/release gates, rollback/config notes, and safe-to-merge/release judgment. |
 | User asks for TDD, red-green-refactor, behavior-first tests, integration tests, or test-first bug fixes/features. | `test-driven-development` | One behavior at a time: failing test, minimal implementation, refactor, repeat. |
 | Something is broken, failing, throwing, slow, flaky, or needs root-cause analysis. | `diagnose` | Reproduction loop, ranked hypotheses, instrumentation, fix, and regression test. |
 | User wants architectural improvement, refactoring opportunities, better testability, lower coupling, better seams, or more AI-navigable structure. | `improve-codebase-architecture` | Architecture improvement findings informed by project language and ADRs. |
-| Non-trivial claim, risky decision, or uncertain conclusion needs adversarial review before it stands. | `doubt-driven-development` | Fresh-context challenge of artifact and contract, followed by reconciliation. |
+| Costly, uncertain, boundary-crossing, weakly-evidenced, or hard-to-test claim/decision needs adversarial review before it stands. | `doubt-driven-development` | Fresh-context challenge of artifact and contract, followed by reconciliation. |
 | User wants to create, revise, or package a skill. | `write-a-skill` | Valid skill folder structure and `SKILL.md` with progressive disclosure. |
 | User needs the current conversation compacted for another agent/session. | `handoff` | Handoff document with context, decisions, evidence, gaps, suggested installed skills, stop condition, and sensitive-data redaction. |
 
@@ -46,10 +46,10 @@ Prefer the shortest sequence that fits. These are allowed escalations, not manda
 - **Prototype path:** `prototype` → capture the validated decision; then use `domain-driven-design`, `shift-left-testing`, `source-driven-development`, `incremental-implementation`, or `test-driven-development` only as the real implementation requires.
 - **Reliability path:** `reliability-design` → `event-driven-architecture` when the issue is actually event contracts, consumers, replay, DLQs, or topology; → `shift-left-testing` when semantics need gates; → `test-driven-development` for the first behavior.
 - **Quality path:** `shift-left-testing` → `reliability-design` if failure semantics are undefined; → `test-driven-development` once the first behavior is ready for red-green proof.
-- **Implementation path:** `source-driven-development` when framework/library behavior matters → `incremental-implementation` for multi-step work → `test-driven-development` inside slices when behavior proof is needed → `continuous-delivery-readiness` when release/deploy/config/migration safety matters.
-- **Bug path:** `diagnose` → deterministic reproduction → fix → regression test; add `shift-left-testing` if the bug reveals a missing gate, `continuous-delivery-readiness` if delivery/config drift is involved, and `doubt-driven-development` if the fix rests on risky assumptions.
-- **Architecture path:** `domain-driven-design` when names/boundaries/rules are unclear → `improve-codebase-architecture` → `shift-left-testing` for seam/gate strategy → `source-driven-development` for framework/library changes → `test-driven-development` for behavior-preserving proof.
-- **Risk path:** state the claim → `doubt-driven-development` → reconcile → proceed, revise, or stop.
+- **Implementation path:** `source-driven-development` when framework/library behavior is version-sensitive, unfamiliar, reusable, or production-critical → `incremental-implementation` when the work needs meaningful slices → `test-driven-development` inside slices when behavior proof is needed → `continuous-delivery-readiness` when release/deploy/config/migration safety matters.
+- **Bug path:** `diagnose` → deterministic reproduction → fix → regression test; add `shift-left-testing` if the bug reveals a missing gate, `continuous-delivery-readiness` if delivery/config drift is involved, and `doubt-driven-development` if the fix rests on costly, uncertain, boundary-crossing, or weakly-evidenced assumptions.
+- **Architecture path:** `domain-driven-design` when names/boundaries/rules are unclear → `improve-codebase-architecture` → `shift-left-testing` for seam/gate strategy → `source-driven-development` for framework/library changes that need source verification → `test-driven-development` for behavior-preserving proof.
+- **Risk path:** state the claim → `doubt-driven-development` when wrongness would be costly or hard to catch directly → reconcile → proceed, revise, or stop.
 - **Continuity path:** `handoff` preserves decisions, evidence, gaps, stop condition, and next suggested installed skills.
 
 ## Operating Rules
@@ -86,9 +86,9 @@ Prefer the shortest sequence that fits. These are allowed escalations, not manda
 ## Failure Modes to Avoid
 
 1. Routing to absent skills from another pack.
-2. Using `doubt-driven-development` for trivial edits.
+2. Using `doubt-driven-development` for trivial edits, routine local choices, or directly proven changes.
 3. Letting `prototype` become the permanent implementation path.
-4. Writing code from memory when framework behavior should be source-verified.
+4. Writing version-sensitive, unfamiliar, reusable, or production-critical framework/library code from memory when official docs should be checked.
 5. Writing a batch of tests before the first red-green loop proves the path.
 6. Treating shift-left testing as permission to test private implementation details early.
 7. Diagnosing without reproduction or a feedback loop.
@@ -100,3 +100,4 @@ Prefer the shortest sequence that fits. These are allowed escalations, not manda
 13. Writing bloated new `SKILL.md` files instead of using progressive disclosure.
 14. Claiming completion without evidence.
 15. Treating Continuous Delivery as CI/CD theater instead of inspecting the real delivery path.
+16. Using `incremental-implementation` story cards or slice rituals for trivial mechanical edits.
