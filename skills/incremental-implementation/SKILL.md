@@ -1,26 +1,37 @@
 ---
 name: incremental-implementation
-description: Delivers changes incrementally. Use when implementing any feature or change that touches more than one file. Use when you're about to write a large amount of code at once, or when a task feels too big to land in one step.
+description: Delivers risky or hard-to-reason-about changes incrementally. Use for multi-file work where behavior, dependencies, rollback, or validation would become difficult if implemented in one pass.
 ---
 
 # Incremental Implementation
 
 ## Overview
 
-Build in thin vertical slices — implement one piece, test it, verify it, then expand. Avoid implementing an entire feature in one pass. Each increment should leave the system in a working, testable state. This is the execution discipline that makes large features manageable.
+Build in thin vertical slices — implement one piece, test it, verify it, then expand. Avoid implementing an entire feature in one pass when the change has enough behavioral scope, dependency risk, or rollback complexity that a single wide edit would be hard to reason about.
+
+Each increment should leave the system in a working, testable state. This is the execution discipline that makes substantial changes manageable without adding ceremony to trivial edits.
 
 ## When to Use
 
-- Implementing any multi-file change
-- Building a new feature from a task breakdown
-- Refactoring existing code
-- Any time you're tempted to write more than ~100 lines before testing
+Use this skill when at least one of these is true:
 
-**When NOT to use:** Single-file, single-function changes where the scope is already minimal.
+- A multi-file change includes behavior, dependencies, risk, or rollback concerns that would be hard to reason about in one pass
+- Building a new feature from a task breakdown
+- Refactoring existing code where correctness must be preserved across multiple call sites or modules
+- The implementation crosses boundaries such as UI/API/database, client/server, package/module, or config/runtime
+- You are tempted to write more than ~100 lines before testing
+- A failed approach would be expensive to unwind unless progress is checkpointed
+
+**When NOT to use:**
+
+- Single-file, single-function changes where the scope is already minimal
+- Mechanical multi-file edits such as renames, import updates, formatting, or obvious prop/type threading
+- Small two-file changes where behavior is clear, rollback is trivial, and validation is immediate
+- Pure documentation or comment edits
 
 ## Slice Setup
 
-Before coding, write a tiny story card for the first slice:
+Before coding, write a tiny story card for the first slice when the change is not already obvious from the task:
 
 ```text
 STORY CARD
@@ -37,6 +48,8 @@ Choose the first slice by either:
 2. the highest uncertainty that could invalidate the approach.
 
 Do not start with broad infrastructure unless it directly enables the first verified behavior. This setup stops implementation from becoming a wide speculative edit before the behavior, boundary, and first proof point are clear.
+
+For tiny low-risk changes, skip the story card and just make the change with immediate verification.
 
 ## The Increment Cycle
 
@@ -56,9 +69,9 @@ Do not start with broad infrastructure unless it directly enables the first veri
 For each slice:
 
 1. **Implement** the smallest complete piece of functionality
-2. **Test** — run the test suite (or write a test if none exists)
-3. **Verify** — confirm the slice works as expected (tests pass, build succeeds, manual check)
-4. **Commit** -- save your progress with a descriptive message using the local commit guidance below
+2. **Test** — run the relevant test suite, or write a test if none exists and the change warrants one
+3. **Verify** — confirm the slice works as expected through tests, build, typecheck, lint, or manual check as appropriate
+4. **Commit** -- save progress with a descriptive message using the local commit guidance below when commits are available and useful
 5. **Move to the next slice** — carry forward, don't restart
 
 ## Slicing Strategies
@@ -174,9 +187,11 @@ Each increment changes one logical thing. Don't mix concerns:
 
 **Good:** Three separate commits — one for each change.
 
+For low-risk mechanical edits, one verified commit is fine. Do not split work merely to satisfy the ritual of slicing.
+
 ### Rule 2: Keep It Compilable
 
-After each increment, the project must build and existing tests must pass. Don't leave the codebase in a broken state between slices.
+After each meaningful increment, the project must build and existing tests must pass. Don't leave the codebase in a broken state between slices.
 
 ### Rule 3: Feature Flags for Incomplete Features
 
@@ -207,12 +222,12 @@ export function createTask(data: TaskInput, options?: { notify?: boolean }) {
 
 ### Rule 5: Rollback-Friendly
 
-Each increment should be independently revertable:
+Each substantial increment should be independently revertable:
 
 - Additive changes (new files, new functions) are easy to revert
 - Modifications to existing code should be minimal and focused
 - Database migrations should have corresponding rollback migrations
-- Avoid deleting something in one commit and replacing it in the same commit — separate them
+- Avoid deleting something in one commit and replacing it in the same commit — separate them when the risk warrants it
 
 ## Working with Agents
 
@@ -232,15 +247,13 @@ Be explicit about what's in scope and what's NOT in scope for each increment.
 
 ## Increment Checklist
 
-After each increment, verify:
+After each meaningful increment, verify:
 
 - [ ] The change does one thing and does it completely
-- [ ] All existing tests still pass (`npm test`)
-- [ ] The build succeeds (`npm run build`)
-- [ ] Type checking passes (`npx tsc --noEmit`)
-- [ ] Linting passes (`npm run lint`)
+- [ ] Relevant existing tests still pass
+- [ ] Relevant build/typecheck/lint checks succeed when the change could affect them
 - [ ] The new functionality works as expected
-- [ ] The change is committed with a descriptive message
+- [ ] The change is committed or summarized as a commit-ready logical unit when commits are unavailable
 
 **Note:** Run each verification command after a change that could affect it. After a successful run, don't repeat the same command unless the code has changed since — re-running on unchanged code adds no information.
 
@@ -248,16 +261,17 @@ After each increment, verify:
 
 | Rationalization | Reality |
 |---|---|
-| "I'll test it all at the end" | Bugs compound. A bug in Slice 1 makes Slices 2-5 wrong. Test each slice. |
+| "I'll test it all at the end" | Bugs compound. A bug in Slice 1 makes Slices 2-5 wrong. Test meaningful slices. |
 | "It's faster to do it all at once" | It *feels* faster until something breaks and you can't find which of 500 changed lines caused it. |
-| "These changes are too small to commit separately" | Small commits are free. Large commits hide bugs and make rollbacks painful. |
-| "I'll add the feature flag later" | If the feature isn't complete, it shouldn't be user-visible. Add the flag now. |
-| "This refactor is small enough to include" | Refactors mixed with features make both harder to review and debug. Separate them. |
+| "This touches two files, so I need a full slicing plan" | Not necessarily. Mechanical or trivial two-file changes do not need story cards and staged delivery. |
+| "These changes are too small to commit separately" | Small commits are useful when they isolate behavior or risk. Ritual tiny commits add noise. |
+| "I'll add the feature flag later" | If the feature isn't complete and could be user-visible, it shouldn't be exposed. Add the flag now. |
+| "This refactor is small enough to include" | Refactors mixed with features make both harder to review and debug. Separate them when they are not required by the slice. |
 | "Let me run the build command again just to be sure" | After a successful run, repeating the same command adds nothing unless the code has changed since. Run it again after subsequent edits, not as reassurance. |
 
 ## Red Flags
 
-- More than 100 lines of code written without running tests
+- More than 100 lines of behavior-changing code written without running tests
 - Multiple unrelated changes in a single increment
 - "Let me just quickly add this too" scope expansion
 - Skipping the test/verify step to move faster
@@ -267,13 +281,14 @@ After each increment, verify:
 - Touching files outside the task scope "while I'm here"
 - Creating new utility files for one-time operations
 - Running the same build/test command twice in a row without any intervening code change
+- Producing story cards, slice plans, or commit rituals for trivial mechanical edits
 
 ## Verification
 
 After completing all increments for a task:
 
-- [ ] Each increment was individually tested and committed
-- [ ] The full test suite passes
-- [ ] The build is clean
+- [ ] Each meaningful increment was individually tested and committed or summarized
+- [ ] The relevant test suite passes
+- [ ] The build/typecheck/lint checks are clean when applicable
 - [ ] The feature works end-to-end as specified
-- [ ] No uncommitted changes remain
+- [ ] No unrelated changes remain
