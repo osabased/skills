@@ -121,9 +121,9 @@ Use the IDE's subagent mechanism to create an isolated or reduced-context review
 
 #### Preferred second-pass subagent review
 
-Prefer a second subagent pass when the first pass found substantive issues, the fix changed the artifact materially, or the remaining risk is still expensive, boundary-crossing, security/data-sensitive, or hard to test directly.
+Because this skill is already restricted to costly, uncertain, boundary-crossing, weakly-evidenced, or hard-to-test decisions, the default is to prefer a second fresh-context subagent pass after the first review has been reconciled and any material fixes have been made.
 
-Do not run a second pass by ritual. Skip it when the first pass produced only trivial findings, the artifact became obvious after the fix, the change is fully covered by direct tests, or subagent orchestration is unavailable/unsafe.
+Do not treat that default as blind ritual. Skip the second pass only when there is a concrete reason: the first pass produced only trivial findings, the artifact became obvious after the fix, direct tests fully prove the relevant claim, the user explicitly prioritizes speed, or safe subagent orchestration is unavailable.
 
 When used, the second pass should be isolated from both the orchestrator reasoning and the first reviewer’s findings unless you are explicitly asking it to audit those findings.
 
@@ -150,7 +150,7 @@ Rules:
 2. Pass the current ARTIFACT + CONTRACT only. Do not pass the CLAIM, private reasoning, or desired outcome.
 3. Do not show the first reviewer's findings unless the second subagent is explicitly auditing the reconciliation. Independent review catches different mistakes; finding-audit checks whether the first findings were handled correctly. Do not mix those modes.
 4. Do not recursively spawn reviewers. After 3 total doubt cycles, escalate to the user or decompose the artifact.
-5. In non-interactive/autonomous contexts, use judgment: prefer a second-pass subagent for expensive unresolved risk, and skip it for trivial or directly proven artifacts. Announce whether it was used or skipped and why when reporting the doubt cycle.
+5. In non-interactive/autonomous contexts, use judgment inside the narrowed trigger scope: prefer the second-pass subagent by default, and skip it only for a concrete reason such as trivial findings, direct proof, explicit speed preference, or unavailable/unsafe subagents. Announce whether it was used or skipped and why when reporting the doubt cycle.
 
 If no safe subagent mechanism is available, state that fresh-context review could not be performed and use the degraded self-questioning fallback from Loading Constraints. Do not replace the subagent path with a separate external-tool workflow by default.
 
@@ -190,7 +190,7 @@ If 3 cycles is "obviously insufficient" because the artifact is large: the artif
 | "If I doubt every step I'll never ship" | Correct. The skill applies to costly, uncertain, boundary-crossing, or weakly-evidenced decisions, not every technically non-trivial choice. |
 | "Two opinions are always better than one" | Not when the second has less context and produces noise. Reconcile, don't defer. |
 | "The reviewer disagreed so I was wrong" | The reviewer lacks your context — disagreement is information, not verdict. Re-read the artifact, classify, then decide. |
-| "A second reviewer is always required" | No. Use a second pass when it is likely to catch a different costly failure mode. Skip it when it would only add ritual. |
+| "A second reviewer is optional ceremony" | Not inside this narrowed skill scope. Prefer the second pass by default after reconciliation, and skip it only for a concrete reason such as trivial findings, direct proof, explicit speed preference, or unsafe/unavailable subagents. |
 
 ## Red Flags
 
@@ -202,7 +202,8 @@ If 3 cycles is "obviously insufficient" because the artifact is large: the artif
 - Re-spawning fresh-context on an unchanged artifact merely for reassurance
 - **Doubt theater (checkable signal)**: across 2 or more cycles where the reviewer surfaced substantive findings, zero findings were classified as actionable. You are validating, not doubting. Stop and escalate.
 - Doubting only after committing — that's `/review`, not doubt-driven development
-- Running the second-pass subagent by default after the artifact is already trivial or directly proven
+- Skipping the second-pass subagent without a concrete reason after this skill has already triggered
+- Running a second pass after the artifact is already trivial, directly proven, or explicitly speed-prioritized
 - Falling back silently when fresh-context subagents are unavailable — surface the limitation and mark the review degraded
 - Stripping the contract from the reviewer's input
 - Passing the CLAIM to the reviewer, which biases toward agreement
@@ -223,5 +224,5 @@ After applying doubt-driven development:
 - [ ] The reviewer's prompt was adversarial ("find issues"), not validating ("is it good")
 - [ ] Findings were classified against the artifact text, not rubber-stamped, using the precedence: contract misread / actionable / trade-off / noise
 - [ ] A stop condition was met: trivial findings, 3 cycles, or user override
-- [ ] A second-pass subagent was used only when remaining risk justified it, or skipped because the artifact was trivial, directly proven, unavailable, or unsafe to review that way
+- [ ] A second-pass subagent was preferred by default inside the narrowed trigger scope, or skipped only for a concrete reason such as trivial findings, direct proof, explicit speed preference, or unavailable/unsafe subagents
 - [ ] If no safe subagent mechanism was available, the output marked the review degraded rather than pretending it was fresh-context
