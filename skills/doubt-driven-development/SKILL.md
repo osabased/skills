@@ -1,43 +1,41 @@
 ---
 name: doubt-driven-development
-description: Subjects every non-trivial decision to a fresh-context adversarial review before it stands. Use when correctness matters more than speed, when working in unfamiliar code, when stakes are high (production, security-sensitive logic, irreversible operations), or any time a confident output would be cheaper to verify now than to debug later.
+description: Uses fresh-context adversarial review for costly, uncertain, boundary-crossing, or weakly-evidenced decisions. Use when a wrong answer would be expensive, confidence is high but evidence is thin, or the artifact is hard to validate directly.
 ---
 
 # Doubt-Driven Development
 
 ## Overview
 
-A confident answer is not a correct one. Long sessions accumulate context that quietly turns assumptions into "facts" without anyone noticing. Doubt-driven development is the discipline of materializing a fresh-context reviewer — biased to **disprove**, not approve — before any non-trivial output stands.
+A confident answer is not a correct one. Long sessions accumulate context that quietly turns assumptions into "facts" without anyone noticing. Doubt-driven development is the discipline of materializing a fresh-context reviewer — biased to **disprove**, not approve — before high-cost or weakly-evidenced outputs stand.
 
-This is not `/review`. `/review` is a verdict on a finished artifact. This is an in-flight posture: non-trivial decisions get cross-examined while course-correction is still cheap.
+This is not `/review`. `/review` is a verdict on a finished artifact. This is an in-flight posture: consequential decisions get cross-examined while course-correction is still cheap.
 
 ## When to Use
 
-A decision is **non-trivial** when at least one of these is true:
+Use this skill when at least one of these is true:
 
-- It introduces or modifies branching logic
-- It crosses a module or service boundary
-- It asserts a property the type system or compiler cannot verify (thread safety, idempotence, ordering, invariants)
-- Its correctness depends on context the future reader cannot see
-- Its blast radius is irreversible (production deploy, data migration, public API change)
+- A wrong answer would be costly to debug, reverse, deploy, migrate, or explain later
+- The decision crosses a module, service, security, data, public API, deployment, or ownership boundary
+- The artifact is hard to test directly, or tests cannot fully prove the relevant claim
+- Confidence is high but evidence is weak, implicit, or mostly based on session momentum
+- The work is in unfamiliar code and the existing invariants are not fully understood
+- The claim depends on properties the type system or compiler cannot verify, such as thread safety, idempotence, ordering, invariants, isolation, or data integrity
+- The blast radius is irreversible or high-stakes, such as production deploys, data migrations, security-sensitive logic, payment/money movement, or public API behavior
 
-Apply the skill when:
-
-- About to make an architectural decision under uncertainty
-- About to commit non-trivial code
-- About to claim a non-obvious fact ("this is safe", "this scales", "this matches the spec")
-- Working in code you don't fully understand
+A decision is usually **not worth a doubt cycle** merely because it is technically non-trivial. It must also have meaningful cost, uncertainty, boundary risk, weak evidence, or limited direct testability.
 
 **When NOT to use:**
 
-- Mechanical operations (renaming, formatting, file moves)
-- Following a clear, unambiguous user instruction
+- Mechanical operations such as renaming, formatting, file moves, import cleanup, or generated-code refreshes
+- Following a clear, unambiguous user instruction where the risk is low
 - Reading or summarizing existing code
 - One-line changes with obvious correctness
-- Pure tooling operations (running tests, listing files)
+- Routine implementation choices already covered by tests and local conventions
+- Pure tooling operations such as running tests or listing files
 - The user has explicitly asked for speed over verification
 
-If you doubt every keystroke, you ship nothing. The skill applies only to non-trivial decisions as defined above.
+If you doubt every keystroke, you ship nothing. The skill applies only when the cost of being wrong justifies the review overhead.
 
 ## Loading Constraints
 
@@ -90,7 +88,7 @@ A fresh-context reviewer needs the **artifact** and the **contract**, not the jo
 
 - Code: the diff or the function — not the whole file
 - Decision: the proposal in 3–5 sentences plus the constraints it has to satisfy
-- Assertion: the claim plus the evidence that supposedly supports it (kept distinct from the Step 1 CLAIM block, which is the orchestrator's hypothesis under scrutiny)
+- Assertion: the claim plus the evidence that supposedly supports it, kept distinct from the Step 1 CLAIM block, which is the orchestrator's hypothesis under scrutiny
 
 Strip your reasoning. If you hand over conclusions, you'll get back validation of your conclusions. The unit must be small enough that a reviewer can hold it in mind in one read — if it's a 500-line PR, decompose first.
 
@@ -123,14 +121,11 @@ Use the IDE's subagent mechanism to create an isolated or reduced-context review
 
 #### Preferred second-pass subagent review
 
-**prefer a second subagent pass by default** after the first review/reconciliation. The second pass is not an exceptional escalation; it is the normal way to get a second independent failure search before the artifact stands. The second pass should be isolated from both the orchestrator reasoning and the first reviewer’s findings unless you are explicitly asking it to audit those findings.
+Prefer a second subagent pass when the first pass found substantive issues, the fix changed the artifact materially, or the remaining risk is still expensive, boundary-crossing, security/data-sensitive, or hard to test directly.
 
-A second subagent is especially important when at least one of these is true:
+Do not run a second pass by ritual. Skip it when the first pass produced only trivial findings, the artifact became obvious after the fix, the change is fully covered by direct tests, or subagent orchestration is unavailable/unsafe.
 
-- The first reviewer found substantive issues and the fix changed the artifact materially
-- The artifact touches production safety, security, data migration, public API behavior, money movement, or irreversible user data
-- The first reviewer lacked domain context and the risk still feels unresolved
-- The artifact spans multiple seams and one reviewer would likely miss a boundary-specific failure mode
+When used, the second pass should be isolated from both the orchestrator reasoning and the first reviewer’s findings unless you are explicitly asking it to audit those findings.
 
 Prefer a different review angle, not a duplicate pass:
 
@@ -154,8 +149,8 @@ Rules:
 1. Keep the second subagent read-only. It reports; the orchestrator edits.
 2. Pass the current ARTIFACT + CONTRACT only. Do not pass the CLAIM, private reasoning, or desired outcome.
 3. Do not show the first reviewer's findings unless the second subagent is explicitly auditing the reconciliation. Independent review catches different mistakes; finding-audit checks whether the first findings were handled correctly. Do not mix those modes.
-4. Do not recursively spawn reviewers. Two subagent passes are the preferred default; after 3 total doubt cycles, escalate to the user or decompose the artifact.
-5. In non-interactive/autonomous contexts, still prefer exactly one second-pass subagent after the first reconciliation. Skip it only when it is impossible, unsafe, or clearly wasteful because the artifact has become trivial. Announce whether it was used or skipped and why.
+4. Do not recursively spawn reviewers. After 3 total doubt cycles, escalate to the user or decompose the artifact.
+5. In non-interactive/autonomous contexts, use judgment: prefer a second-pass subagent for expensive unresolved risk, and skip it for trivial or directly proven artifacts. Announce whether it was used or skipped and why when reporting the doubt cycle.
 
 If no safe subagent mechanism is available, state that fresh-context review could not be performed and use the degraded self-questioning fallback from Loading Constraints. Do not replace the subagent path with a separate external-tool workflow by default.
 
@@ -188,29 +183,29 @@ If 3 cycles is "obviously insufficient" because the artifact is large: the artif
 
 | Rationalization | Reality |
 |---|---|
-| "I'm confident, skip the doubt step" | Confidence correlates poorly with correctness on novel problems. Moments of certainty are exactly when blind spots hide. |
-| "Spawning a reviewer is expensive" | Debugging a wrong commit in production is more expensive. The check is bounded; the bug isn't. |
-| "The reviewer will just nitpick" | Only if unscoped. Constrain the prompt to "issues that would make this fail under the contract." |
-| "I'll do doubt at the end with `/review`" | `/review` is a final gate. Doubt-driven catches wrong directions early when course-correction is cheap. By PR time it's too late. |
-| "If I doubt every step I'll never ship" | The skill applies to non-trivial decisions, not every keystroke. Re-read "When NOT to Use." |
+| "I'm confident, skip the doubt step" | Confidence is least trustworthy when evidence is thin, stakes are high, or the session has been reinforcing the same assumption for a long time. |
+| "Spawning a reviewer is expensive" | It is expensive, so use it where the cost of being wrong is higher than the review overhead. |
+| "The reviewer will just nitpick" | Only if unscoped. Constrain the prompt to issues that would make the artifact fail under the contract. |
+| "I'll do doubt at the end with `/review`" | `/review` is a final gate. Doubt-driven catches wrong directions early when course-correction is cheap. |
+| "If I doubt every step I'll never ship" | Correct. The skill applies to costly, uncertain, boundary-crossing, or weakly-evidenced decisions, not every technically non-trivial choice. |
 | "Two opinions are always better than one" | Not when the second has less context and produces noise. Reconcile, don't defer. |
 | "The reviewer disagreed so I was wrong" | The reviewer lacks your context — disagreement is information, not verdict. Re-read the artifact, classify, then decide. |
-| "A second reviewer is overhead" | For this skill, the work is already non-trivial/hard enough to justify doubt. Prefer one second-pass subagent unless it is impossible, unsafe, or the artifact has become trivial. |
+| "A second reviewer is always required" | No. Use a second pass when it is likely to catch a different costly failure mode. Skip it when it would only add ritual. |
 
 ## Red Flags
 
-- Spawning a fresh-context reviewer for a one-line rename or formatting change
+- Spawning a fresh-context reviewer for a one-line rename, formatting change, or routine local edit
 - Treating reviewer output as authoritative without re-reading the artifact text
 - Looping >3 cycles without escalating to the user
 - Prompting the reviewer with "is this good?" instead of "find issues"
 - Skipping doubt under time pressure on a high-stakes decision
-- Re-spawning fresh-context on an unchanged artifact (you'll get the same findings; you're stalling)
+- Re-spawning fresh-context on an unchanged artifact merely for reassurance
 - **Doubt theater (checkable signal)**: across 2 or more cycles where the reviewer surfaced substantive findings, zero findings were classified as actionable. You are validating, not doubting. Stop and escalate.
 - Doubting only after committing — that's `/review`, not doubt-driven development
-- Skipping the preferred second-pass subagent without a concrete reason such as unavailable subagents, unsafe nested orchestration, or a now-trivial artifact
+- Running the second-pass subagent by default after the artifact is already trivial or directly proven
 - Falling back silently when fresh-context subagents are unavailable — surface the limitation and mark the review degraded
 - Stripping the contract from the reviewer's input
-- Passing the CLAIM to the reviewer (biases toward agreement)
+- Passing the CLAIM to the reviewer, which biases toward agreement
 
 ## Interaction with Other Skills
 
@@ -221,11 +216,12 @@ If 3 cycles is "obviously insufficient" because the artifact is large: the artif
 
 After applying doubt-driven development:
 
-- [ ] Every non-trivial decision (per the definition above) was named explicitly as a CLAIM before standing
-- [ ] At least one fresh-context review per non-trivial artifact (a failing test produced by TDD's RED step satisfies this for behavioral claims, per Interaction with Other Skills)
+- [ ] The decision justified a doubt cycle because the cost, uncertainty, boundary risk, weak evidence, or limited direct testability was explicit
+- [ ] The claim was named explicitly before standing
+- [ ] At least one fresh-context review was used for the selected artifact, unless a TDD RED test already provided concrete disproof for a behavioral claim
 - [ ] The reviewer received ARTIFACT + CONTRACT — NOT the CLAIM, NOT your reasoning
 - [ ] The reviewer's prompt was adversarial ("find issues"), not validating ("is it good")
-- [ ] Findings were classified against the artifact text (not rubber-stamped) using the precedence: contract misread / actionable / trade-off / noise
-- [ ] A stop condition was met (trivial findings, 3 cycles, or user override)
-- [ ] A second-pass subagent was used by default, or skipped only because it was impossible, unsafe, or the artifact had become trivial
+- [ ] Findings were classified against the artifact text, not rubber-stamped, using the precedence: contract misread / actionable / trade-off / noise
+- [ ] A stop condition was met: trivial findings, 3 cycles, or user override
+- [ ] A second-pass subagent was used only when remaining risk justified it, or skipped because the artifact was trivial, directly proven, unavailable, or unsafe to review that way
 - [ ] If no safe subagent mechanism was available, the output marked the review degraded rather than pretending it was fresh-context
