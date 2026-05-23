@@ -1,2 +1,1 @@
-# skills
-my personal skills
+A collection of my personal skills.
