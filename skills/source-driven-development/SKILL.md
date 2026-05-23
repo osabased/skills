@@ -1,6 +1,6 @@
 ---
 name: source-driven-development
-description: Grounds version-sensitive, unfamiliar, reusable, or production-critical framework/library decisions in official documentation. Use when framework/library behavior may be stale, version-specific, copied across the project, or explicitly needs source-backed correctness.
+description: Grounds version-sensitive, unfamiliar, reusable, or production-critical framework/library decisions in official documentation. Use when framework/library behavior may be stale, version-specific, copied across the project, or explicitly needs source-backed correctness. Once selected, authoritative source use is mandatory; if no authoritative source is fetched, this skill was not used.
 ---
 
 # Source-Driven Development
@@ -8,6 +8,8 @@ description: Grounds version-sensitive, unfamiliar, reusable, or production-crit
 ## Overview
 
 Source-driven development backs framework and library decisions with official documentation when documentation materially changes correctness. It is not a mandate to fetch docs for every line of framework code. Use it when APIs, conventions, versions, deprecations, or reusable patterns could make memory-based implementation wrong.
+
+**Core invariant:** trigger narrowly, execute strictly. If this skill is selected, fetch and use authoritative sources before making the source-sensitive decision. If no authoritative source is fetched, do not claim source-driven development was used; either proceed without this skill or explicitly mark the decision as unverified.
 
 Training data goes stale, APIs get deprecated, and best practices evolve. This skill keeps high-consequence or reusable code trustworthy because the pattern traces back to an authoritative source the user can check.
 
@@ -30,6 +32,7 @@ Use this skill when at least one of these is true:
 - The change only follows an obvious local convention already established in nearby code
 - The framework/library use is routine, low-risk, and not being turned into a reusable pattern
 - The user explicitly wants speed over verification, such as "just do it quickly"
+- You are not going to fetch and use authoritative sources; in that case, do not label the work source-driven
 
 ## The Process
 
@@ -70,6 +73,8 @@ If versions are missing or ambiguous and the decision is version-sensitive, ask 
 ### Step 2: Fetch Official Documentation
 
 Fetch the specific documentation page for the feature you're implementing. Not the homepage, not the full docs — the relevant page.
+
+Fetching is mandatory once this skill is selected. If you cannot access a relevant authoritative source, do not silently continue as if the work is source-driven. State the blocker, mark the decision as unverified, and either ask for a source/version or proceed under a clearly labeled assumption.
 
 **Source hierarchy (in order of authority):**
 
@@ -131,6 +136,8 @@ Surface the conflict. Don't silently pick one.
 
 Non-trivial framework-specific decisions get citations. The user must be able to verify decisions where documentation affected the implementation.
 
+A source-driven answer without fetched sources is invalid. Either cite the authoritative sources used, or say the decision could not be source-verified and should not be treated as source-driven.
+
 **In code comments, only when the citation helps future maintainers:**
 
 ```typescript
@@ -177,9 +184,11 @@ Honesty about what you couldn't verify is more valuable than false confidence.
 | "I'll just mention it might be outdated" | A disclaimer doesn't help. Either verify and cite, or clearly flag it as unverified. |
 | "This is framework code, so I must fetch docs" | Not always. Routine local edits, obvious project conventions, and version-insensitive code do not need a documentation expedition. |
 | "This is a simple task, no need to check" | Simple reusable patterns can become templates. Verify when the pattern will be copied, shared, or used as project precedent. |
+| "I selected source-driven-development, but the source probably would not change anything" | Then either fetch the source anyway or admit this skill should not have been selected. Source-driven work requires source use. |
 
 ## Red Flags
 
+- Claiming source-driven development while no authoritative source was fetched
 - Writing version-sensitive or reusable framework-specific code without checking the docs for that version
 - Using "I believe" or "I think" about a changing API instead of citing the source
 - Implementing a pattern without knowing which version it applies to
@@ -194,6 +203,7 @@ Honesty about what you couldn't verify is more valuable than false confidence.
 
 After implementing with source-driven development:
 
+- [ ] At least one relevant authoritative source was fetched and used; if not, source-driven development was not actually used
 - [ ] Framework and library versions were identified when the decision depended on version behavior
 - [ ] Official documentation was fetched for version-sensitive, unfamiliar, reusable, or production-critical framework/library patterns
 - [ ] All cited sources are official documentation, official changelogs/blogs, web standards references, or compatibility references
