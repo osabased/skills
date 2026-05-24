@@ -1,6 +1,6 @@
 ---
 name: source-driven-development
-description: Grounds version-sensitive, unfamiliar, reusable, or production-critical framework/library decisions in official documentation. Use when framework/library behavior may be stale, version-specific, copied across the project, or explicitly needs source-backed correctness. Once selected, authoritative source use is mandatory; if no authoritative source is fetched, this skill was not used.
+description: Grounds source-sensitive technical decisions in authoritative documentation when library, framework, API, tool, standard, or platform behavior may be version-sensitive, unfamiliar, stale, reusable, production-critical, or easy to misremember. Use when the task depends on current docs, official behavior, exact config syntax, package APIs, CLI commands, model/tool capabilities, or source-backed correctness. Once selected, authoritative source use is mandatory; if no authoritative source is fetched, this skill was not used.
 ---
 
 # Source-Driven Development
@@ -23,7 +23,8 @@ Use this skill when at least one of these is true:
 - Implementing features where the framework's recommended approach materially matters, such as forms, routing, data fetching, state management, auth, migrations, build config, or plugin setup
 - Reviewing or improving framework-specific code that may rely on stale, deprecated, or non-recommended patterns
 - Production-facing behavior depends on a framework/library API working exactly as assumed
-- You are unfamiliar with the framework/library version or cannot confidently identify the current recommended pattern
+- Exact config syntax, CLI behavior, tool capabilities, package APIs, model/tool settings, or platform rules materially affect correctness
+- You are unfamiliar with the framework/library/tool version or cannot confidently identify the current recommended pattern
 
 **When NOT to use:**
 
