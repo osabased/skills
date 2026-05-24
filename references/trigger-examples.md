@@ -19,7 +19,12 @@ Use this file as a lightweight regression suite for whether the installed skills
 | “Check whether this causes a butterfly effect of bad decisions.” | `using-agent-skills` → `doubt-driven-development`; possibly `improve-codebase-architecture` for structural impact |
 | “Refactor this code so it is easier to test.” | `using-agent-skills` → `improve-codebase-architecture` or `incremental-implementation` depending on scope |
 | “This touches retries and duplicate requests.” | `using-agent-skills` → `reliability-design` |
+| “The business logic or requirements are ambiguous.” | `using-agent-skills` → `domain-driven-design` |
+| “The domain model, names, rules, or boundaries feel confused.” | `using-agent-skills` → `domain-driven-design` |
+| “This feature has pricing, permissions, eligibility, lifecycle, approval, or policy rules.” | `using-agent-skills` → `domain-driven-design` |
 | “This uses queues/events/outbox.” | `using-agent-skills` → `event-driven-architecture` |
+| “This needs a webhook, background job, event notification, message handler, or async side effect.” | `using-agent-skills` → `event-driven-architecture` |
+| “This workflow has eventual consistency, fan-out, retries, ordering, replay, or multiple consumers.” | `using-agent-skills` → `event-driven-architecture` |
 | “Create a demo/prototype before committing to the design.” | `using-agent-skills` → `prototype` |
 
 ## Should not trigger the router by itself
@@ -27,6 +32,7 @@ Use this file as a lightweight regression suite for whether the installed skills
 | Prompt | Reason |
 |---|---|
 | “What is DDD?” | Simple explanation unless the user is applying it to an artifact/codebase |
+| “What is event-driven architecture?” | Simple explanation unless the user is applying it to an artifact/codebase or evaluating an architecture decision |
 | “Rewrite this sentence.” | Simple prose edit, no workflow needed |
 | “Summarize this paragraph.” | Summarization, no skill routing needed unless the summary is a handoff artifact |
 | “What does this term mean?” | Simple factual explanation unless it affects implementation or domain modeling |
@@ -40,6 +46,6 @@ Before selecting a skill, ask:
 1. Would this skill materially improve the result, or is it ceremony?
 2. Is there a smaller skill that fits better?
 3. Is the user asking for a simple answer, or for an artifact/decision/change?
-4. Does the task need evidence, implementation slices, source verification, tests, reliability semantics, or adversarial review?
+4. Does the task need evidence, implementation slices, source verification, tests, reliability semantics, domain modeling, event contracts, or adversarial review?
 
 If the answer is no, proceed normally.
