@@ -1,6 +1,6 @@
 ---
 name: using-agent-skills
-description: Discovers and invokes the skills included in this skills pack. Use when starting a session, choosing a workflow for a user request, deciding whether a task needs ideation, domain modeling, event-driven architecture, prototyping, source-verified implementation, reliability design, shift-left testing, continuous delivery readiness, TDD, diagnosis, architecture improvement, adversarial review, handoff, or skill authoring.
+description: Routes nontrivial coding, debugging, planning, design, review, testing, documentation, architecture, reliability, release, research, or skill-authoring work to the smallest useful installed skill. Use at the start of any nontrivial user request involving a codebase, agent workflow, implementation plan, bug, refactor, architecture decision, test strategy, source-sensitive library/framework behavior, release readiness, prototype, or skill-pack change. Also use when the user asks whether something is useful, production-ready, reliable, overengineered, under-specified, risky, or worth changing.
 ---
 
 # Using Agent Skills
@@ -16,6 +16,20 @@ Do not route to absent skills. If no installed skill applies, proceed normally a
 ## Routing Rules
 
 Use the table as the primary router. Chain skills only when the next skill changes a decision, artifact, test, implementation slice, release judgment, or stop condition.
+
+### Trigger on normal work language
+
+Do not wait for the user to say “use a skill,” “choose a workflow,” or name a skill. This router exists to catch ordinary work requests and select the smallest useful installed skill.
+
+Common prompts that should trigger this router when the task is nontrivial:
+
+- “Review this,” “audit this,” “is this good,” “is this production ready,” or “is this actually beneficial?”
+- “Be skeptical,” “be honest,” “review your final judgment,” or “make sure this does not cause bad decisions.”
+- “Plan it out,” “apply it,” “fix this bug,” “implement this,” “refactor this,” or “make this reliable.”
+- “Check the official docs,” “make sure this config is valid,” or “verify the current syntax/API.”
+- “Create/revise/package this skill,” “review this skill pack,” or “can this be made into a meaningful skill?”
+
+Do not over-trigger for casual explanations, simple rewrites, tiny formatting edits, or tasks where a workflow would add more ceremony than value.
 
 | Situation / Intent | Use | Primary Output |
 |---|---|---|
