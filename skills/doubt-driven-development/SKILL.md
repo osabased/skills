@@ -1,6 +1,6 @@
 ---
 name: doubt-driven-development
-description: Uses fresh-context adversarial review for costly, uncertain, boundary-crossing, or weakly-evidenced decisions. Use when a wrong answer would be expensive, confidence is high but evidence is thin, or the artifact is hard to validate directly.
+description: Uses fresh-context adversarial review for costly, uncertain, boundary-crossing, weakly-evidenced, high-confidence, or hard-to-validate decisions. Use when a wrong answer would be expensive, confidence is high but evidence is thin, the artifact is hard to validate directly, or the user asks to be skeptical, honest, critical, review final judgment, verify usefulness, check whether a change is actually beneficial, or identify bad assumptions before accepting a result.
 ---
 
 # Doubt-Driven Development
@@ -19,6 +19,8 @@ Use this skill when at least one of these is true:
 - The decision crosses a module, service, security, data, public API, deployment, or ownership boundary
 - The artifact is hard to test directly, or tests cannot fully prove the relevant claim
 - Confidence is high but evidence is weak, implicit, or mostly based on session momentum
+- The user asks for skepticism, honesty, a critical pass, final-judgment review, usefulness verification, or a check that a change is actually beneficial rather than merely plausible
+- The user asks to identify bad assumptions, avoid butterfly-effect decisions, or make sure the result does not create worse downstream behavior
 - The work is in unfamiliar code and the existing invariants are not fully understood
 - The claim depends on properties the type system or compiler cannot verify, such as thread safety, idempotence, ordering, invariants, isolation, or data integrity
 - The blast radius is irreversible or high-stakes, such as production deploys, data migrations, security-sensitive logic, payment/money movement, or public API behavior
