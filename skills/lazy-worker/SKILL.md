@@ -1,6 +1,6 @@
 ---
 name: lazy-worker
-description: Use when a task may involve building new functionality, adding dependencies, choosing external projects, designing from scratch, or duplicating existing behavior. Guides the agent to reuse high-quality existing code, dependencies, tools, libraries, and project patterns before custom implementation, while rejecting low-trust or poor-fit reuse candidates.
+description: Guides the agent to reuse high-quality existing code, dependencies, tools, libraries, and project patterns before custom implementation, while rejecting low-trust or poor-fit reuse candidates. Use when a task may involve building new functionality, adding dependencies, choosing external projects, designing from scratch, or duplicating existing behavior.
 ---
 
 # Lazy Worker
@@ -53,6 +53,8 @@ Common examples:
 - test utilities
 - code generation
 - project scaffolding
+
+**When NOT to use:** Do not use this skill for tiny direct edits, pure explanations, formatting-only changes, or cases where the user explicitly wants a custom implementation with no reuse search. Do not perform external project research when local code, installed dependencies, or known project constraints already determine the right path.
 
 Do not use this skill as an excuse to under-solve the task. The goal is less unnecessary work, not less correctness.
 
